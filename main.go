@@ -2,15 +2,16 @@ package main
 
 import (
 	"database/sql"
+	"dbmodel/app"
 	"flag"
 	"fmt"
 	_ "github.com/denisenkom/go-mssqldb"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/haming123/wego/worm"
 	_ "github.com/lib/pq"
-	"wego/worm"
 )
 
-func InitMysql(cfg *DbParam) (*sql.DB, error) {
+func InitMysql(cfg *app.DbParam) (*sql.DB, error) {
 	cnnstr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8",
 		cfg.DbUser, cfg.DbPwd, cfg.DbHost, cfg.DbPort, cfg.DbName)
 	fmt.Println(cnnstr)
@@ -25,7 +26,7 @@ func InitMysql(cfg *DbParam) (*sql.DB, error) {
 	return db, nil
 }
 
-func InitMssql(cfg *DbParam) (*sql.DB, error) {
+func InitMssql(cfg *app.DbParam) (*sql.DB, error) {
 	cnnstr := fmt.Sprintf("server=%s;database=%s;user id=%s;password=%s;port=%s;encrypt=disable",
 		cfg.DbHost, cfg.DbName, cfg.DbUser, cfg.DbPwd, cfg.DbPort)
 	fmt.Println(cnnstr)
@@ -40,7 +41,7 @@ func InitMssql(cfg *DbParam) (*sql.DB, error) {
 	return db, nil
 }
 
-func InitPgres(cfg *DbParam) (*sql.DB, error) {
+func InitPgres(cfg *app.DbParam) (*sql.DB, error) {
 	cnnstr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		cfg.DbHost, cfg.DbPort, cfg.DbUser, cfg.DbPwd, cfg.DbName)
 	fmt.Println(cnnstr)
@@ -72,7 +73,7 @@ func main() {
 	fmt.Printf("table_name:%s\n", table_name)
 
 	var err error
-	cfg, err := ReadAppConfig(conf_file)
+	cfg, err := app.ReadAppConfig(conf_file)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -89,7 +90,7 @@ func main() {
 		table_name2 = fmt.Sprintf("%s.%s", cfg.DbCfg.DbName, table_name)
 		wdb, err = worm.NewMysql(db_cnn)
 		if err != nil {
-			fmt.Println( err)
+			fmt.Println(err)
 			return
 		}
 	} else if cfg.DbDriver == "mssql" {
@@ -100,7 +101,7 @@ func main() {
 		}
 		wdb, err = worm.NewSqlServer(db_cnn)
 		if err != nil {
-			fmt.Println( err)
+			fmt.Println(err)
 			return
 		}
 	} else if cfg.DbDriver == "postgres" {
@@ -111,7 +112,7 @@ func main() {
 		}
 		wdb, err = worm.NewPostgres(db_cnn)
 		if err != nil {
-			fmt.Println( err)
+			fmt.Println(err)
 			return
 		}
 	}
@@ -120,6 +121,5 @@ func main() {
 		return
 	}
 
-	CodeGen4Table(wdb, table_name2, model_file)
+	app.CodeGen4Table(wdb, table_name2, model_file)
 }
-

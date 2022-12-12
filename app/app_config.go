@@ -1,15 +1,15 @@
-package main
+package app
 
 import (
-	"wego/wini"
+	"github.com/haming123/wego/wini"
 )
 
 type DbParam struct {
-	DbHost 		string 		`ini:"db_host"`
-	DbPort 		string 		`ini:"db_port"`
-	DbName 		string 		`ini:"db_name"`
-	DbUser 		string 		`ini:"db_user"`
-	DbPwd  		string 		`ini:"db_pwd"`
+	DbHost string `ini:"db_host"`
+	DbPort string `ini:"db_port"`
+	DbName string `ini:"db_name"`
+	DbUser string `ini:"db_user"`
+	DbPwd  string `ini:"db_pwd"`
 }
 
 type AppConfig struct {
@@ -17,11 +17,12 @@ type AppConfig struct {
 	PkgName    string  `ini:"pkg_name"`
 	CreateTime string  `ini:"create_time"`
 	UseTag     bool    `ini:"use_field_tag"`
-	UsePool    bool    `ini:"use_model_pol"`
+	UsePool    bool    `ini:"use_pool"`
 	DbCfg      DbParam `ini:"db"`
 }
 
 var AppCfg AppConfig
+
 func ReadAppConfig(conf_file ...string) (*AppConfig, error) {
 	data, err := wini.InitConfigData(conf_file...)
 	if err != nil {
@@ -40,4 +41,3 @@ func ReadAppConfig(conf_file ...string) (*AppConfig, error) {
 	AppCfg.UseTag = true
 	return &AppCfg, nil
 }
-

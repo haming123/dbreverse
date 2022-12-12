@@ -5,8 +5,9 @@ pkg_name = model
 #create_time字段的名称
 create_time = created
 #是否采用pool来生成Model对象， true or false
-use_model_pool = flase
+use_pool = flase
 
+#mysql
 [db]
 db_host = 127.0.0.1
 db_port = 3306
@@ -14,3 +15,10 @@ db_name = demo
 db_user = user_name
 db_pwd = user_pwd
 
+#mssql
+#[db]
+#db_host = 127.0.0.1
+#db_port = 1433
+#db_name = demo
+#db_user = user_name
+#db_pwd = user_pwd

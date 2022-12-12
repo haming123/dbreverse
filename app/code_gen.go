@@ -1,11 +1,11 @@
-package main
+package app
 
 import (
 	"bytes"
 	"fmt"
+	"github.com/haming123/wego/worm"
 	"io/ioutil"
 	"strings"
-	"wego/worm"
 )
 
 func FirstToUpper(s string) string {
@@ -17,7 +17,7 @@ func FirstToUpper(s string) string {
 	b.Grow(len(s))
 	for i := 0; i < len(s); i++ {
 		c := s[i]
-		if i==0 && 'a' <= c && c <= 'z' {
+		if i == 0 && 'a' <= c && c <= 'z' {
 			c -= 'a' - 'A'
 		}
 		b.WriteByte(c)
@@ -46,7 +46,7 @@ func gen_model_header(dialect worm.Dialect, flds []worm.ColumnInfo) string {
 }
 
 func gen_model_struct(dialect worm.Dialect, flds []worm.ColumnInfo, table_name string) string {
-	strs :=strings.Split(table_name, ".")
+	strs := strings.Split(table_name, ".")
 	if len(strs) == 2 {
 		table_name = strs[1]
 	}
@@ -86,7 +86,7 @@ func gen_model_struct(dialect worm.Dialect, flds []worm.ColumnInfo, table_name s
 			}
 			buff.WriteString("\"`\n")
 		} else {
-			name_str := fmt.Sprintf("\t%-20s", "DB_" + field.Name)
+			name_str := fmt.Sprintf("\t%-20s", "DB_"+field.Name)
 			buff.WriteString(name_str)
 			go_type_str := fmt.Sprintf("\t%-6s", go_type)
 			buff.WriteString(go_type_str)
@@ -104,7 +104,7 @@ func (ent *DB_User)TableName() string {
 }
 */
 func gen_func_table_name(table_name string) string {
-	strs :=strings.Split(table_name, ".")
+	strs := strings.Split(table_name, ".")
 	if len(strs) == 2 {
 		table_name = strs[1]
 	}
@@ -123,42 +123,25 @@ func gen_func_table_name(table_name string) string {
 }
 
 /*
-var pool_user = worm.ModelPool{}
-func NewModel_user(dbs *worm.DbSession, auto_put ...bool) *worm.DbModel {
-	md := pool_user.Get()
-	if md == nil {
-		return dbs.Model(&User{}).WithModelPool(&pool_user, auto_put...)
-	} else {
-		return md.SetDbSession(dbs)
-	}
-}
+var g_user User
+var pool_user = worm.NewModelPool(g_user)
 */
 func gen_func_model_pool(table_name string) string {
-	strs :=strings.Split(table_name, ".")
+	strs := strings.Split(table_name, ".")
 	if len(strs) == 2 {
 		table_name = strs[1]
 	}
 	var_name := strings.ToLower(table_name)
 	struct_name := FirstToUpper(table_name)
-	p_ent_name := "pool_" + var_name
 
 	var buff bytes.Buffer
-
-	buff.WriteString(fmt.Sprintf("var %s = worm.ModelPool{}\n", p_ent_name))
-	buff.WriteString(fmt.Sprintf("func NewModel_%s(dbs *worm.DbSession, auto_put ...bool) *worm.DbModel {\n", var_name))
-	buff.WriteString(fmt.Sprintf("\tmd := %s.Get()\n", p_ent_name))
-	buff.WriteString(fmt.Sprintf("\tif md == nil {\n"))
-	buff.WriteString(fmt.Sprintf("\t\treturn worm.Model(&%s{}).WithModelPool(&%s, auto_put...)\n", struct_name, p_ent_name))
-	buff.WriteString(fmt.Sprintf("\t} else {\n"))
-	buff.WriteString(fmt.Sprintf("\t\treturn md.SetDbSession(dbs)\n"))
-	buff.WriteString(fmt.Sprintf("\t}\n"))
-	buff.WriteString(fmt.Sprintf("}\n\n"))
-
+	buff.WriteString(fmt.Sprintf("var g_%s %s\n", var_name, struct_name))
+	buff.WriteString(fmt.Sprintf("var pool_%s = worm.NewModelPool(g_%s)\n", var_name, var_name))
 	return buff.String()
 }
 
 func gen_model_code(db *worm.DbEngine, table_name string) (string, error) {
-	dialect :=db.GetDialect()
+	dialect := db.GetDialect()
 	flds, err := dialect.GetColumns(db.DB(), table_name)
 	if err != nil {
 		return "", err
