@@ -123,8 +123,8 @@ func gen_func_table_name(table_name string) string {
 }
 
 /*
-var g_user User
-var pool_user = worm.NewModelPool(g_user)
+var G_user User
+var P_user = worm.NewModelPool(G_user)
 */
 func gen_func_model_pool(table_name string) string {
 	strs := strings.Split(table_name, ".")
@@ -135,8 +135,8 @@ func gen_func_model_pool(table_name string) string {
 	struct_name := FirstToUpper(table_name)
 
 	var buff bytes.Buffer
-	buff.WriteString(fmt.Sprintf("var g_%s %s\n", var_name, struct_name))
-	buff.WriteString(fmt.Sprintf("var pool_%s = worm.NewModelPool(g_%s)\n", var_name, var_name))
+	buff.WriteString(fmt.Sprintf("var G_%s %s\n", var_name, struct_name))
+	buff.WriteString(fmt.Sprintf("var P_%s = worm.NewModelPool(G_%s)\n", var_name, var_name))
 	return buff.String()
 }
 
